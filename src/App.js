@@ -1,24 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import GlobalStyles, { Container } from "./globalStyles";
+import styled from "styled-components";
+import Pokemon from "./Pokemon";
+
+const Title = styled.h1`
+  text-align: center;
+  color: #333;
+`;
+
+const AppContainer = styled(Container)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 3rem 0.5rem;
+`;
+
+const PokemonsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppContainer>
+      <GlobalStyles />
+      <Title>Pokemon Codex</Title>
+      <PokemonsContainer>
+        <Pokemon />
+      </PokemonsContainer>
+    </AppContainer>
   );
 }
 
