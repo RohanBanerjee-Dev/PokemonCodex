@@ -3,7 +3,8 @@ import GlobalStyles, { Container } from "./globalStyles";
 import styled from "styled-components";
 import Pokemon from "./Pokemon";
 import PokemonService from "./services/pokemons";
-import { GenericButton } from "./GenericButton/GenericButton";
+import Page from "./Page";
+import Loader from "./Loader";
 
 const Title = styled.h1`
   text-align: center;
@@ -25,36 +26,47 @@ const PokemonsContainer = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  margin: 1.3rem 0;
+  margin: 1rem 0;
 `;
 
 function App() {
-  const [allPokemons, setAllPokemons] = useState([]);
+  const [allPokemons, setAllPokemons] = useState({
+    totalPokemonCount: null,
+    pokemons: [],
+  });
+  const [loading, setLoading] = useState(0);
 
   useEffect(() => {
-    getAllPokemons();
+    getPokemons();
   }, []);
 
-  const getAllPokemons = async () => {
-    const p1 = new PokemonService(20);
-    let p2 = await p1.getAllPokemons();
-    p2.forEach(async (item, idx, arr) => {
-      let { data } = await p1.getPokemonDetails(item.url);
-      arr[idx] = data;
-      setAllPokemons(arr);
+  const getPokemons = async (limit = 0) => {
+    const p1 = new PokemonService(limit);
+    setLoading(50);
+    let { results, count } = await p1.getAllPokemons();
+    let itemsToShow = !limit ? 0 : limit - (limit - 20);
+    let detailsList = results
+      .map(async (item, idx, arr) => {
+        let { data } = await p1.getPokemonDetails(item.url);
+        return (arr[idx] = await data);
+      })
+      .slice(-itemsToShow);
+    let resolvedList = await Promise.all([...detailsList]);
+    setAllPokemons({
+      pokemons: resolvedList,
+      totalPokemonCount: count,
     });
-
-    console.log(p2);
+    setLoading(100);
   };
 
   return (
     <AppContainer>
+      <Loader progress={loading} setProgress={setLoading} color="#80f" />
       <GlobalStyles />
       <Title>Pokemon Codex</Title>
       <PokemonsContainer>
-        {allPokemons.length &&
-          allPokemons.map((pokemon, index) => {
-            console.log(pokemon.types);
+        {allPokemons.pokemons.length &&
+          allPokemons.pokemons.map((pokemon, index) => {
             return (
               <Pokemon
                 id={pokemon.id}
@@ -66,7 +78,7 @@ function App() {
             );
           })}
       </PokemonsContainer>
-      <GenericButton width={"20%"}>Load More</GenericButton>
+      <Page itemCount={allPokemons.totalPokemonCount} onChange={getPokemons} />
     </AppContainer>
   );
 }

@@ -47,7 +47,7 @@ const Pokemon = ({ id, name, type, image }) => {
     <>
       <CardContainer className={type}>
         <PokemonID>
-          <small>${id}</small>
+          <small>#{id}</small>
         </PokemonID>
         <ImageContainer src={image} />
         <DetailWrapper>
