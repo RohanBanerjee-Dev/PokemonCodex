@@ -45,7 +45,7 @@ const DetailWrapper = styled.div`
 const Pokemon = ({ id, name, type, image }) => {
   return (
     <>
-      <CardContainer className={type}>
+      <CardContainer>
         <PokemonID>
           <small>#{id}</small>
         </PokemonID>
