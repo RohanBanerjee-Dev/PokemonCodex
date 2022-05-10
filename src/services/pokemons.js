@@ -3,6 +3,7 @@ import axios from "axios";
 class PokemonService {
   constructor(limit) {
     this.baseUrl = `https://pokeapi.co/api/v2/pokemon?limit=${limit || 0}`;
+    this.typesUrl = `https://pogoapi.net/api/v1/fast_moves.json`;
   }
 
   async getAllPokemons() {
@@ -14,6 +15,20 @@ class PokemonService {
   async getPokemonDetails(url) {
     let pokemonDetail = await axios.get(url);
     return pokemonDetail;
+  }
+
+  async getPokemonTypes() {
+    let { data } = await axios.get(this.typesUrl);
+    let obj = {};
+
+    for (let i = 0; i < data.length; i++) {
+      let type = data[i].type;
+      if (obj[type] === undefined) {
+        obj[data[i].type] = 1;
+      }
+    }
+    let arr = Object.keys(obj);
+    return arr;
   }
 }
 
