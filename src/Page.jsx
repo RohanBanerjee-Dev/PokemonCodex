@@ -26,6 +26,7 @@ const Page = ({ itemCount, onChange }) => {
       itemRender={textItemRender}
       onChange={handleChange}
       current={current}
+      style={{ margin: "30px 0" }}
     />
   );
 };

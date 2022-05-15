@@ -1,14 +1,17 @@
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import GlobalStyles, { Container } from "./globalStyles";
 import styled from "styled-components";
 import Pokemon from "./Pokemon";
-import PokemonService from "./services/pokemons";
 import Page from "./Page";
 import Loader from "./Loader";
 import { GenericButton } from "./GenericButton/GenericButton";
 import { BsSearch } from "react-icons/bs";
+import { AiFillHome } from "react-icons/ai";
 import "./App.css";
 import Modal from "./Modal";
+import usePokemonFilter from "./Hooks/usePokemonFilter";
+import Lottie from "lottie-react";
+import PokeballAnimation from "./assests/img/96855-pokeball-loading-animation.json";
 
 const Title = styled.h1`
   text-align: center;
@@ -55,7 +58,7 @@ const PokemonsContainer = styled.div`
 const ModalWrapper = styled.div`
   height: 350px;
   width: 600px;
-  padding: 40px;
+  padding: 35px;
   text-align: center;
 `;
 
@@ -89,44 +92,15 @@ const ModalPokemonSearch = styled(ModalPokemonFilter)`
     font-size: 15px;
     border: 2px solid cyan;
     padding: 7px 10px;
+    display: block;
+    margin: 10px auto;
   }
 `;
 
 function App() {
-  const [allPokemons, setAllPokemons] = useState({
-    totalPokemonCount: null,
-    pokemons: [],
-    types: [],
-  });
-  const [loading, setLoading] = useState(0);
+  const { pokemonList, handleTypeChange, ...options } = usePokemonFilter();
   const [toggleModal, setToggleModal] = useState(false);
   const selectElement = useRef();
-
-  useEffect(() => {
-    getPokemons();
-  }, []);
-
-  const getPokemons = async (limit = 0) => {
-    const p1 = new PokemonService(limit);
-    let pokemonTypes = await p1.getPokemonTypes();
-    setLoading(50);
-    let { results, count } = await p1.getAllPokemons();
-    let itemsToShow = !limit ? 0 : limit - (limit - 20);
-    let detailsList = results
-      .map(async (item, idx, arr) => {
-        let { data } = await p1.getPokemonDetails(item.url);
-        return (arr[idx] = await data);
-      })
-      .slice(-itemsToShow);
-    let resolvedList = await Promise.all([...detailsList]);
-    setAllPokemons({
-      ...allPokemons,
-      pokemons: resolvedList,
-      totalPokemonCount: count,
-      types: pokemonTypes,
-    });
-    setLoading(100);
-  };
 
   const handleModalClick = () => {
     setToggleModal(!toggleModal);
@@ -142,7 +116,8 @@ function App() {
               name="pokemon-type"
               onFocus={() => (selectElement.current.size = 5)}
               onBlur={() => (selectElement.current.size = 1)}
-              onChange={() => {
+              onChange={(e) => {
+                handleTypeChange(e);
                 selectElement.current.size = 1;
                 selectElement.current.blur();
               }}
@@ -151,30 +126,48 @@ function App() {
               <option value="All" defaultChecked>
                 All
               </option>
-              {allPokemons.types.map((item, idx) => {
+              {options.pokemonTypes.map((item, idx) => {
                 return (
                   <option value={item} key={idx}>
                     {item}
                   </option>
                 );
               })}
-              {/* <option value="Fire">Fire</option>
-              <option value="Water">Water</option>
-              <option value="Bug">Bug</option> */}
             </select>
           </ModalPokemonFilter>
           <ModalPokemonSearch>
             <h2>Search By Name</h2>
             <input type="text" placeholder="Pokemon Name" />
+            <GenericButton width="27%">Apply</GenericButton>
           </ModalPokemonSearch>
         </ModalWrapper>
       </>
     );
   };
 
+  const renderPokemons = () => {
+    return pokemonList.length
+      ? pokemonList.map((pokemon, index) => {
+          return (
+            <Pokemon
+              id={pokemon.id}
+              name={pokemon.name}
+              type={pokemon.types[0].type.name}
+              image={pokemon.sprites.other.dream_world.front_default}
+              key={index}
+            />
+          );
+        })
+      : null;
+  };
+
   return (
     <AppContainer>
-      <Loader progress={loading} setProgress={setLoading} color="#4b6cb7" />
+      <Loader
+        progress={options.loading}
+        setProgress={options.setLoading}
+        color="#4b6cb7"
+      />
       <GlobalStyles />
       <NavBar>
         <Title>Pokemon Codex</Title>
@@ -186,20 +179,23 @@ function App() {
         </GenericButton>
       </NavBar>
       <PokemonsContainer>
-        {allPokemons.pokemons.length &&
-          allPokemons.pokemons.map((pokemon, index) => {
-            return (
-              <Pokemon
-                id={pokemon.id}
-                name={pokemon.name}
-                type={pokemon.types[0].type.name}
-                image={pokemon.sprites.other.dream_world.front_default}
-                key={index}
-              />
-            );
-          })}
+        {!options.filterLoading ? (
+          renderPokemons()
+        ) : (
+          <Lottie
+            animationData={PokeballAnimation}
+            loop="true"
+            style={{ height: "180px", width: "180px", marginTop: "50px" }}
+          />
+        )}
       </PokemonsContainer>
-      <Page itemCount={allPokemons.totalPokemonCount} onChange={getPokemons} />
+      {options.filterLoading || options.loading === 50 ? null : (
+        <Page
+          itemCount={options.totalPokemonCount}
+          onChange={options.getPokemons}
+        />
+      )}
+
       <Modal isOpen={toggleModal} modalControl={setToggleModal}>
         {ModalContent}
       </Modal>

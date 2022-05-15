@@ -9,6 +9,7 @@ export const GenericButton = styled.button`
   cursor: pointer;
   border: none;
   outline: none;
+  letter-spacing: 1.2px;
   border-radius: 10px;
   box-shadow: 10px 10px 34px -15px rgba(0, 0, 0, 0.5);
 `;
