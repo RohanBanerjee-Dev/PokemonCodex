@@ -97,8 +97,29 @@ const ModalPokemonSearch = styled(ModalPokemonFilter)`
   }
 `;
 
+const NotFoundElement = styled.div`
+  margin: 50px 20px;
+
+  h3 {
+    background: -webkit-linear-gradient(#4b6cb7, #182848);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+`;
+
+const HomeButton = styled.div`
+  font-size: 27px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #00bfff;
+  cursor: pointer;
+  margin: 30px auto;
+`;
+
 function App() {
-  const { pokemonList, handleTypeChange, ...options } = usePokemonFilter();
+  const { pokemonList, handleTypeChange, handleSearchChange, ...options } =
+    usePokemonFilter();
   const [toggleModal, setToggleModal] = useState(false);
   const selectElement = useRef();
 
@@ -137,7 +158,11 @@ function App() {
           </ModalPokemonFilter>
           <ModalPokemonSearch>
             <h2>Search By Name</h2>
-            <input type="text" placeholder="Pokemon Name" />
+            <input
+              type="text"
+              placeholder="Pokemon Name"
+              onChange={(e) => handleSearchChange(e)}
+            />
             <GenericButton width="27%">Apply</GenericButton>
           </ModalPokemonSearch>
         </ModalWrapper>
@@ -159,6 +184,29 @@ function App() {
           );
         })
       : null;
+  };
+
+  const resetFilter = () => {
+    options.setSelectedPokemonType("All");
+    options.setSearchField("");
+    // options.getPokemons(JSON.parse(localStorage.getItem("Limit")));
+  };
+
+  const renderError = () => {
+    return options.selectPokemonType !== "All" &&
+      options.filteredPokemonsInPage.length === 0 &&
+      options.selectSearchPokemon !== "" &&
+      options.searchPokemonInPage === 0 ? (
+      <NotFoundElement>
+        <h3>
+          {`Oops! couldn't found anything related ${options.selectPokemonType}`}
+          , <br></br> Click the home button to get back to the main page .
+        </h3>
+        <HomeButton onClick={resetFilter}>
+          <AiFillHome />
+        </HomeButton>
+      </NotFoundElement>
+    ) : null;
   };
 
   return (
@@ -189,13 +237,17 @@ function App() {
           />
         )}
       </PokemonsContainer>
-      {options.filterLoading || options.loading === 50 ? null : (
-        <Page
-          itemCount={options.totalPokemonCount}
-          onChange={options.getPokemons}
-        />
-      )}
-
+      {options.selectPokemonType !== "All" &&
+      options.filteredPokemonsInPage.length ? (
+        <HomeButton onClick={resetFilter}>
+          <AiFillHome />
+        </HomeButton>
+      ) : null}
+      {!options.filteredPokemonsInPage.length && renderError()}
+      <Page
+        itemCount={options.totalPokemonCount}
+        onChange={options.getPokemons}
+      />
       <Modal isOpen={toggleModal} modalControl={setToggleModal}>
         {ModalContent}
       </Modal>

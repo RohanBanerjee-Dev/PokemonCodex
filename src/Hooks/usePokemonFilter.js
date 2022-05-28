@@ -6,18 +6,21 @@ const usePokemonFilter = () => {
     totalPokemonCount: null,
     pokemonsPerPage: [],
     filteredPokemons: [],
+    searchFilteredPokemons: [],
     types: [],
   });
 
   const [loading, setLoading] = useState(0);
   const [filterLoading, setFilterLoading] = useState(false);
   const [selectedPokemonType, setSelectedPokemonType] = useState("All");
+  const [searchField, setSearchField] = useState("");
 
   useEffect(() => {
     getPokemons();
   }, []);
 
   const getPokemons = async (limit = 0) => {
+    localStorage.setItem("Limit", JSON.stringify(limit));
     const p1 = new PokemonService(limit);
     let pokemonTypes = await p1.getPokemonTypes();
     setLoading(50);
@@ -66,15 +69,42 @@ const usePokemonFilter = () => {
     }, 4000);
   };
 
+  const handleSearchChange = (e) => {
+    setFilterLoading(true);
+    setTimeout(() => {
+      setSearchField(e.target.value.toLowerCase());
+      let arr = [...allPokemons.pokemonsPerPage];
+      let filteredSearchItems = arr.filter((item) =>
+        item.name.includes(searchField.toLowerCase())
+      );
+      setAllPokemons({
+        ...allPokemons,
+        searchFilteredPokemons: filteredSearchItems,
+      });
+      setFilterLoading(false);
+    }, 4000);
+  };
+
   return {
     pokemonList:
-      selectedPokemonType === "All"
+      selectedPokemonType === "All" && searchField === ""
         ? allPokemons.pokemonsPerPage
+        : searchField !== ""
+        ? allPokemons.searchFilteredPokemons
         : allPokemons.filteredPokemons,
     totalPokemonCount: allPokemons.totalPokemonCount,
+    filteredPokemonsInPage: allPokemons.filteredPokemons,
+    searchPokemonInPage: allPokemons.searchFilteredPokemons,
+    NormalPokemonsInPage: allPokemons.pokemonsPerPage,
     pokemonTypes: allPokemons.types,
+    selectPokemonType: selectedPokemonType,
+    selectSearchPokemon: searchField,
     handleTypeChange,
+    handleSearchChange,
     getPokemons,
+    setSelectedPokemonType,
+    setSearchField,
+    setAllPokemons,
     loading,
     filterLoading,
     setLoading,

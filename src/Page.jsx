@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Pagination from "rc-pagination";
 import "rc-pagination/assets/index.css";
 
-const Page = ({ itemCount, onChange }) => {
+const Page = ({ itemCount, onChange, showPagination }) => {
   const [current, setCurrent] = useState(1);
   const textItemRender = (current, type, element) => {
     if (type === "prev") {
