@@ -193,13 +193,15 @@ function App() {
   };
 
   const renderError = () => {
-    return options.selectPokemonType !== "All" &&
-      options.filteredPokemonsInPage.length === 0 &&
-      options.selectSearchPokemon !== "" &&
-      options.searchPokemonInPage === 0 ? (
+    return (options.selectPokemonType !== "All" &&
+      !options.filteredPokemonsInPage.length) ||
+      (options.selectSearchPokemon !== "" &&
+        !options.searchPokemonInPage.length) ? (
       <NotFoundElement>
         <h3>
-          {`Oops! couldn't found anything related ${options.selectPokemonType}`}
+          {options.selectSearchPokemon !== ""
+            ? `Oops! couldn't found anything related ${options.selectSearchPokemon}`
+            : `Oops! couldn't found anything related ${options.selectPokemonType}`}
           , <br></br> Click the home button to get back to the main page .
         </h3>
         <HomeButton onClick={resetFilter}>
@@ -237,13 +239,20 @@ function App() {
           />
         )}
       </PokemonsContainer>
-      {options.selectPokemonType !== "All" &&
-      options.filteredPokemonsInPage.length ? (
+      {(options.selectPokemonType !== "All" &&
+        options.filteredPokemonsInPage.length) ||
+      (options.selectSearchPokemon !== "" &&
+        options.searchPokemonInPage.length) ? (
         <HomeButton onClick={resetFilter}>
           <AiFillHome />
         </HomeButton>
-      ) : null}
-      {!options.filteredPokemonsInPage.length && renderError()}
+      ) : (
+        renderError()
+      )}
+      {/* {!options.filteredPokemonsInPage.length ||
+      !options.searchPokemonInPage.length
+        ? renderError()
+        : null} */}
       <Page
         itemCount={options.totalPokemonCount}
         onChange={options.getPokemons}
