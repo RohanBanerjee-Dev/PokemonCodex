@@ -69,20 +69,30 @@ const usePokemonFilter = () => {
     }, 4000);
   };
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (searchValue) => {
     setFilterLoading(true);
-    setTimeout(() => {
-      setSearchField(e.target.value.toLowerCase());
-      let arr = [...allPokemons.pokemonsPerPage];
-      let filteredSearchItems = arr.filter((item) =>
-        item.name.includes(searchField.toLowerCase())
-      );
-      setAllPokemons({
-        ...allPokemons,
-        searchFilteredPokemons: filteredSearchItems,
-      });
-      setFilterLoading(false);
-    }, 4000);
+    // setTimeout(() => {
+    //   setSearchField(searchValue.toLowerCase());
+    //   let arr = [...allPokemons.pokemonsPerPage];
+    //   let filteredSearchItems = arr.filter((item) =>
+    //     item.name.includes(searchField.toLowerCase())
+    //   );
+    //   setAllPokemons({
+    //     ...allPokemons,
+    //     searchFilteredPokemons: filteredSearchItems,
+    //   });
+    //   setFilterLoading(false);
+    // }, 4000);
+    setSearchField(searchValue.toLowerCase());
+    let arr = [...allPokemons.pokemonsPerPage];
+    let filteredSearchItems = arr.filter((item) =>
+      item.name.includes(searchField)
+    );
+    setAllPokemons({
+      ...allPokemons,
+      searchFilteredPokemons: filteredSearchItems,
+    });
+    setFilterLoading(false);
   };
 
   return {

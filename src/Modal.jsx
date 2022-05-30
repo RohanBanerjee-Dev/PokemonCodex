@@ -1,16 +1,15 @@
-import React, { useRef } from "react";
+import React from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { AiOutlineClose } from "react-icons/ai";
 
 const BackDrop = styled.div`
-  height: 100%;
+  height: 100vh;
   width: 100%;
   background: rgba(0, 0, 0, 0.7);
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  z-index: 1;
 `;
 
 const ModalContent = styled.div`

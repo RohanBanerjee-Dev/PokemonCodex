@@ -161,9 +161,8 @@ function App() {
             <input
               type="text"
               placeholder="Pokemon Name"
-              onChange={(e) => handleSearchChange(e)}
+              onChange={(e) => handleSearchChange(e.target.value)}
             />
-            <GenericButton width="27%">Apply</GenericButton>
           </ModalPokemonSearch>
         </ModalWrapper>
       </>
@@ -249,10 +248,6 @@ function App() {
       ) : (
         renderError()
       )}
-      {/* {!options.filteredPokemonsInPage.length ||
-      !options.searchPokemonInPage.length
-        ? renderError()
-        : null} */}
       <Page
         itemCount={options.totalPokemonCount}
         onChange={options.getPokemons}
